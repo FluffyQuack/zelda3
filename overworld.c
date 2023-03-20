@@ -477,7 +477,8 @@ setsong:
   Sprite_ReloadAll_Overworld();
   if (!(overworld_screen_index & 0x40))
     Sprite_InitializeMirrorPortal();
-  sound_effect_ambient = sram_progress_indicator < 2 ? 1 : 5;
+  //sound_effect_ambient = sram_progress_indicator < 2 ? 1 : 5;
+  sound_effect_ambient = 1; //Fluffy (Rain): Always play rain sound ambience
   if (follower_indicator == 6)
     follower_indicator = 0;
 
@@ -729,8 +730,8 @@ void Module09_Overworld() {  // 82a475
 void OverworldOverlay_HandleRain() {  // 82a4cd
   static const uint8 kOverworld_DrawBadWeather_X[4] = { 1, 0, 1, 0 };
   static const uint8 kOverworld_DrawBadWeather_Y[4] = { 0, 17, 0, 17 };
-  if (BYTE(overworld_screen_index) != 0x70 && sram_progress_indicator >= 2 || (save_ow_event_info[0x70] & 0x20))
-    return;
+  //if (BYTE(overworld_screen_index) != 0x70 && sram_progress_indicator >= 2 || (save_ow_event_info[0x70] & 0x20)) //Fluffy (Rain): Always animate rain
+    //return;
   if (frame_counter == 3 || frame_counter == 88) {
     CGADSUB_copy = 0x32;
   } else if (frame_counter == 5 || frame_counter == 44 || frame_counter == 90) {
@@ -825,8 +826,8 @@ after:
   BYTE(overworld_area_index) = new_area;
   if (!savegame_is_darkworld || link_item_moon_pearl) {
     uint8 music = overworld_music[new_area];
-    if ((music & 0xf0) == 0)
-      sound_effect_ambient = 5;
+    //if ((music & 0xf0) == 0) //Fluffy (Rain): Never stop rain sound effect between overworld screen
+      //sound_effect_ambient = 5;
     if (!ZeldaIsPlayingMusicTrack(music & 0xf))
       music_control = 0xf1;
   }
@@ -932,8 +933,8 @@ void Module09_LoadNewSprites() {  // 82abed
   }
   Sprite_OverworldReloadAll_justLoad();
   num_memorized_tiles = 0;
-  if (sram_progress_indicator >= 2 && submodule_index != 18)
-    Overworld_SetFixedColAndScroll();
+  //if (sram_progress_indicator >= 2 && submodule_index != 18) /Fluffy (Rain): Don't remove rain between screens
+    //Overworld_SetFixedColAndScroll();
   Overworld_StartScrollTransition();
 }
 
@@ -1151,6 +1152,7 @@ getout:
     xv = (sram_progress_indicator < 2) ? 0x9f : 0x96;
   }
 load_overlay:
+  xv = 0x9f; //Fluffy (Rain): Always add rain
   map16_load_src_off = 0x390;
   overlay_index = overworld_screen_index = xv;
   map16_load_var2 = (map16_load_src_off - 0x400 & 0xf80) >> 7;
@@ -1201,7 +1203,8 @@ void Module09_FadeBackInFromMosaic() {  // 82b0d2
     last_music_control = music_unk1;
     if (BYTE(overworld_screen_index) != 0x80 && BYTE(overworld_screen_index) != 0x2a) {
       uint8 m = overworld_music[BYTE(overworld_screen_index)];
-      sound_effect_ambient = (m >> 4) ? (m >> 4) : 5;
+      //sound_effect_ambient = (m >> 4) ? (m >> 4) : 5;
+      sound_effect_ambient = 1; //Fluffy (Rain): Always rain
       if (!ZeldaIsPlayingMusicTrack(m & 0xf))
         music_control = (m & 0xf);
     }
@@ -1719,7 +1722,8 @@ void Overworld_FinalizeEntryOntoScreen() {  // 82c242
     submodule_index = 0;
     subsubmodule_index = 0;
     uint8 m = overworld_music[BYTE(overworld_screen_index)];
-    sound_effect_ambient = m >> 4;
+    //sound_effect_ambient = m >> 4;
+    sound_effect_ambient = 1; //Fluffy (Rain): Always rain
     if (music_unk1 == 0xf1)
       music_control = m & 0xf;
   }
